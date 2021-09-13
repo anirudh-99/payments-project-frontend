@@ -1,5 +1,6 @@
-<div class="container">
-  <mat-stepper #stepper labelPosition="bottom">
+<mat-toolbar class="navbar"><span>HDFC Bank</span></mat-toolbar>
+<div class="container mt-3">
+  <mat-stepper  #stepper labelPosition="bottom">
 
     <mat-step [stepControl]="senderForm" label="Sender details">
       <div class="container mt-5">
@@ -87,8 +88,8 @@
             <mat-form-field appearance="outline" class="col-6 m-auto">
               <mat-label>Transfer type</mat-label>
               <mat-select formControlName="transferType">
-                <mat-option value="customer">Customer</mat-option>
-                <mat-option value="bankTransfer">Bank transfer</mat-option>
+                <mat-option value="CUSTOMER">Customer</mat-option>
+                <mat-option value="BANK">Bank transfer</mat-option>
               </mat-select>
             </mat-form-field>
           </div>
@@ -106,10 +107,17 @@
               <mat-label>Amount</mat-label>
               <input matInput formControlName="amount" class="money-field" />
               <span matPrefix class="currency-symbol">₹</span>
+              <mat-error *ngIf="this.transactionForm.get('amount')?.hasError('min')">
+                Amount should atleast be greater than zero
+              </mat-error>
+              <mat-error *ngIf="this.transactionForm.get('amount')?.hasError('required')">
+                Amount field is required
+              </mat-error>
+              <mat-hint [align]="'start'">Note: Transactional charges are imposed with each transaction</mat-hint>
             </mat-form-field>
           </div>
-          <div class="row">
-            <button type="submit" class="col-sm-8 col-md-3 m-auto" color="primary" mat-raised-button>Initiate
+          <div class="row mt-3">
+            <button [disabled]="this.transactionForm.invalid" type="submit" class="col-sm-8 col-md-3 m-auto" color="primary" mat-raised-button>Initiate
               transaction</button>
           </div>
         </form>

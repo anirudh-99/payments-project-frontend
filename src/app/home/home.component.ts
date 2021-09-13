@@ -1,6 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { ModalComponent } from '../modal/modal.component';
 import { BankBic } from '../models/bankBic';
 import { Customer } from '../models/customer';
 import { MessageCode } from '../models/messageCode';
@@ -21,8 +23,9 @@ export class HomeComponent implements OnInit {
 
   messageCodes!: MessageCode[];
   accountDetailsLoading: boolean = false;
+  dialogRef!: MatDialogRef<ModalComponent>;
 
-  constructor(private _formBuilder: FormBuilder, private homeService: HomeService, private http: HttpClient) {
+  constructor(private _formBuilder: FormBuilder, private homeService: HomeService, private dialog: MatDialog) {
   }
 
   ngOnInit(): void {
@@ -38,9 +41,9 @@ export class HomeComponent implements OnInit {
       "accountHolderNumber": ['']
     });
     this.transactionForm = this._formBuilder.group({
-      "transferType": ['customer'],
+      "transferType": ['CUSTOMER'],
       "messageCode": ['', [Validators.required]],
-      "amount": ['', [Validators.required]],
+      "amount": ['', [Validators.required,Validators.min(1)]],
       "transferFee": [{ value: '', disabled: true }]
     });
 
@@ -54,14 +57,13 @@ export class HomeComponent implements OnInit {
               "accountHolderName": cust.name,
               "clearBalance": cust.clearBalance
             });
-          },(error)=> {
+          }, (error) => {
             this.senderForm.patchValue({
-              "accountHolderName":'',
-              "clearBalance":'0'
+              "accountHolderName": '',
+              "clearBalance": '0'
             });
           });
       }
-      console.log(this.accountNumberField);
     });
 
     this.bicField?.statusChanges.subscribe(status => {
@@ -72,9 +74,9 @@ export class HomeComponent implements OnInit {
             this.receiverForm.patchValue({
               "bankName": bic.name
             });
-          },(error)=> {
+          }, (error) => {
             this.receiverForm.patchValue({
-              "bankName":'',
+              "bankName": '',
             });
           });
       }
@@ -98,7 +100,6 @@ export class HomeComponent implements OnInit {
     return (control: AbstractControl): ValidationErrors | null => {
       if (acctId.length === 14) {
         this.homeService.getCustomerDetails(acctId).subscribe((customer: Customer) => {
-          console.log(customer);
           return null;
         }, () => {
           return { accountIdInvalid: true };
@@ -113,22 +114,39 @@ export class HomeComponent implements OnInit {
     return ctrl;
   }
 
-  onTransactionSubmit(){
-     let trans:TransactionReq = {
-       transferType: this.transactionForm.get('transferType')?.value,
-       messageCode: this.transactionForm.get('messageCode')?.value,
-       amount: this.transactionForm.get('amount')?.value,
-       receiverAcctNumber: this.receiverForm.get('accountHolderNumber')?.value,
-       receiverName: this.receiverForm.get('accountHolderName')?.value,
-       senderAcctNumber: this.accountNumberField?.value,
-       receiverBic: this.bicField?.value
-     };
-     console.log(trans);
-     this.homeService.postTransaction(trans).subscribe((data)=> {
-       console.log(data);
-     },(error)=> {
-       console.log(error);
-     })
+  onTransactionSubmit() {
+    let trans: TransactionReq = {
+      transferType: this.transactionForm.get('transferType')?.value,
+      messageCode: this.transactionForm.get('messageCode')?.value,
+      amount: this.transactionForm.get('amount')?.value,
+      receiverAcctNumber: this.receiverForm.get('accountHolderNumber')?.value,
+      receiverName: this.receiverForm.get('accountHolderName')?.value,
+      senderAcctNumber: this.accountNumberField?.value,
+      receiverBic: this.bicField?.value
+    };
+
+
+    this.dialogRef = this.dialog.open(ModalComponent, {
+      data: {
+        title: "",
+        message: "",
+        isLoading: true
+      }
+    });
+
+    this.homeService.postTransaction(trans).subscribe((data) => {
+      this.dialogRef.componentInstance.data = {
+        title: "Transaction successfull 🥳",
+        message: "amount has been sent successfully",
+        isLoading: false
+      };
+    }, (error) => {
+      this.dialogRef.componentInstance.data = {
+        title: "Transaction failed 😥",
+        message: error?.error?.message,
+        isLoading: false
+      };
+    })
   }
 
 

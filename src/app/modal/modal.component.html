@@ -1,0 +1,8 @@
+<mat-spinner *ngIf="data.isLoading; else info"></mat-spinner>
+<ng-template #info>
+  <h1 mat-dialog-title>{{this.data.title}}</h1>
+  <div mat-dialog-content>{{this.data.message}}</div>
+  <div mat-dialog-actions>
+    <button mat-button mat-dialog-close>Close</button>
+  </div>
+</ng-template>
