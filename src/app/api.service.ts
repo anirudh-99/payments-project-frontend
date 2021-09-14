@@ -3,12 +3,12 @@ import { Injectable } from '@angular/core';
 import { BankBic } from 'src/app/models/bankBic';
 import { Customer } from 'src/app/models/customer';
 import { MessageCode } from 'src/app/models/messageCode';
-import { TransactionReq } from 'src/app/models/transaction';
+import { TransactionHistoryResponse, TransactionReq } from 'src/app/models/transaction';
 
 @Injectable({
   providedIn: 'root'
 })
-export class HomeService {
+export class APIService {
 
   constructor(private http:HttpClient) { }
 
@@ -26,6 +26,13 @@ export class HomeService {
 
   postTransaction(trans:TransactionReq){
     return this.http.post('/transaction',trans);
+  }
+
+  getTransactionHistory(page:number,startDate:string,endDate:string){
+    return this.http.post<TransactionHistoryResponse>(`/transaction/history?page=${page}`,{
+      startDate,
+      endDate
+    });
   }
 
 }

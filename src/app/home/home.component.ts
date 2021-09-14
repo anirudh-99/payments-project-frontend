@@ -7,7 +7,7 @@ import { BankBic } from '../models/bankBic';
 import { Customer } from '../models/customer';
 import { MessageCode } from '../models/messageCode';
 import { TransactionReq } from '../models/transaction';
-import { HomeService } from './homeService/home.service';
+import { APIService } from '../api.service';
 
 @Component({
   selector: 'app-home',
@@ -25,7 +25,7 @@ export class HomeComponent implements OnInit {
   accountDetailsLoading: boolean = false;
   dialogRef!: MatDialogRef<ModalComponent>;
 
-  constructor(private _formBuilder: FormBuilder, private homeService: HomeService, private dialog: MatDialog) {
+  constructor(private _formBuilder: FormBuilder, private apiService: APIService, private dialog: MatDialog) {
   }
 
   ngOnInit(): void {
@@ -51,7 +51,7 @@ export class HomeComponent implements OnInit {
     this.accountNumberField?.statusChanges.subscribe(status => {
       if (status === "VALID") {
         let accountNumber: string = this.accountNumberField?.value;
-        this.homeService.getCustomerDetails(accountNumber)
+        this.apiService.getCustomerDetails(accountNumber)
           .subscribe((cust: Customer) => {
             this.senderForm.patchValue({
               "accountHolderName": cust.name,
@@ -69,7 +69,7 @@ export class HomeComponent implements OnInit {
     this.bicField?.statusChanges.subscribe(status => {
       if (status === "VALID") {
         let bic: string = this.bicField?.value;
-        this.homeService.getBankDetails(bic)
+        this.apiService.getBankDetails(bic)
           .subscribe((bic: BankBic) => {
             this.receiverForm.patchValue({
               "bankName": bic.name
@@ -82,7 +82,7 @@ export class HomeComponent implements OnInit {
       }
     });
 
-    this.homeService.getAllMessageCodes().subscribe((msgCodes: MessageCode[]) => {
+    this.apiService.getAllMessageCodes().subscribe((msgCodes: MessageCode[]) => {
       this.messageCodes = msgCodes;
     });
 
@@ -99,7 +99,7 @@ export class HomeComponent implements OnInit {
   accountIdValidator(acctId: string): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
       if (acctId.length === 14) {
-        this.homeService.getCustomerDetails(acctId).subscribe((customer: Customer) => {
+        this.apiService.getCustomerDetails(acctId).subscribe((customer: Customer) => {
           return null;
         }, () => {
           return { accountIdInvalid: true };
@@ -134,7 +134,7 @@ export class HomeComponent implements OnInit {
       }
     });
 
-    this.homeService.postTransaction(trans).subscribe((data) => {
+    this.apiService.postTransaction(trans).subscribe((data) => {
       this.dialogRef.componentInstance.data = {
         title: "Transaction successfull 🥳",
         message: "amount has been sent successfully",

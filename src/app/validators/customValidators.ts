@@ -2,12 +2,12 @@ import { Injectable } from "@angular/core";
 import { AbstractControl, AsyncValidator, ValidationErrors } from "@angular/forms";
 import { Observable } from "rxjs";
 import { catchError, map } from "rxjs/operators";
-import { HomeService } from "../home/homeService/home.service";
+import { APIService } from "../api.service";
 import { Customer } from "../models/customer";
 
 @Injectable({ providedIn: 'root' })
 export class AccountIdValidator implements AsyncValidator {
-    constructor(private homeService: HomeService) { }
+    constructor(private homeService: APIService) { }
 
     validate(
         ctrl: AbstractControl

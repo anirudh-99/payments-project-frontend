@@ -16,6 +16,11 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { APIInterceptor } from './interceptors/apiInterceptor';
 import { ModalComponent } from './modal/modal.component';
 import {MatToolbarModule} from '@angular/material/toolbar';
+import {MatTableModule} from '@angular/material/table';
+import {MatPaginatorModule} from '@angular/material/paginator';
+import {MatDatepickerModule} from '@angular/material/datepicker';
+import {MatNativeDateModule} from '@angular/material/core';
+import { HistoryComponent } from './history/history.component';
 
 
 @NgModule({
@@ -23,6 +28,7 @@ import {MatToolbarModule} from '@angular/material/toolbar';
     AppComponent,
     HomeComponent,
     ModalComponent,
+    HistoryComponent
   ],
   imports: [
     BrowserModule,
@@ -34,6 +40,10 @@ import {MatToolbarModule} from '@angular/material/toolbar';
     MatButtonModule,
     MatSelectModule,
     MatDialogModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
     MatToolbarModule,
     MatProgressSpinnerModule,
     ReactiveFormsModule,
